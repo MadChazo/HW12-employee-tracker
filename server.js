@@ -3,7 +3,9 @@ const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const express = require("express");
 require("dotenv").config();
+const actions = require("./lib/actions.js");
 
+const employee = new actions();
 const PORT = process.env.PORT;
 const app = express();
 
@@ -11,16 +13,16 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// Connect to database
-const db = mysql.createConnection(
-  {
-    host: process.env.HOST,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-    database: process.env.DATABASE,
-  },
-  console.log(`Connected to the ${database} database.`)
-);
+// // Connect to database
+// const db = mysql.createConnection(
+//   {
+//     host: process.env.HOST,
+//     user: process.env.USER,
+//     password: process.env.PASSWORD,
+//     database: process.env.DATABASE,
+//   },
+//   console.log(`Connected to the ${process.env.DATABASE} database.`)
+// );
 
 //Question array
 const question = [
@@ -41,55 +43,35 @@ const question = [
     ],
   },
 ];
-const addDptQ = [
-  {
-    type: "input",
-    message: "Enter the name of the new department.",
-    name: "dptName",
-    default: "New Department",
-    validate: function (input) {
-      if (!input) {
-        return "Must input department name.";
-      } else {
-        return true;
-      }
-    },
-  },
-];
-const addEmpQs = [
-  {
-    type: "input",
-    message: "Enter the employee's first name.",
-    name: "empFName",
-    default: "John",
-    validate: function (input) {
-      if (!input) {
-        return "Must input employee name.";
-      } else {
-        return true;
-      }
-    },
-  },
-  {
-    type: "input",
-    message: "Enter the employee's last name.",
-    name: "empLName",
-    default: "Doe",
-  },
-  {
-    type: "list",
-    message: "Choose the employee's role.",
-    name: "empRole",
-    choices: []
-  },
-  {
-    type: "list",
-    message: "Choose the employee's manager.",
-    name: "empMan",
-    default: "None",
-    choices: []
+
+// Directs to proper function to handle action requested
+function handleAnswers(answers) {
+  switch (answers.action) {
+    case "Add Department":
+      employee.addDept();
+      break;
+    case "Add Employee":
+      employee.addEmp();
+      break;
+    case "Add Role":
+      employee.addRole();
+      break;
+    case "Update Employee Role":
+      employee.updateRole();
+      break;
+    case "View All Departments":
+      employee.viewDept();
+      break;
+    case "View All Employees":
+      employee.viewEmp();
+      break;
+    case "View All Roles":
+      employee.viewRole();
+      break;
+    default:
+      return;
   }
-]
+}
 
 // Initialize function
 function init() {
