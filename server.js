@@ -1,8 +1,8 @@
 // Required packages
-const mysql = require("mysql2");
 const inquirer = require("inquirer");
 const express = require("express");
 require("dotenv").config();
+// Require in actions file
 const actions = require("./lib/actions.js");
 
 const employee = new actions();
@@ -13,18 +13,7 @@ const app = express();
 app.use(express.urlencoded({ extended: false }));
 app.use(express.json());
 
-// // Connect to database
-// const db = mysql.createConnection(
-//   {
-//     host: process.env.HOST,
-//     user: process.env.USER,
-//     password: process.env.PASSWORD,
-//     database: process.env.DATABASE,
-//   },
-//   console.log(`Connected to the ${process.env.DATABASE} database.`)
-// );
-
-//Question array
+// Question array
 const question = [
   {
     type: "list",
@@ -48,33 +37,34 @@ const question = [
 function handleAnswers(answers) {
   switch (answers.action) {
     case "Add Department":
-      employee.addDept();
+      employee.addDept(init);
       break;
     case "Add Employee":
-      employee.addEmp();
+      employee.addEmp(init);
       break;
     case "Add Role":
-      employee.addRole();
+      employee.addRole(init);
       break;
     case "Update Employee Role":
-      employee.updateRole();
+      employee.updateRole(init);
       break;
     case "View All Departments":
-      employee.viewDept();
+      employee.viewDept(init);
       break;
     case "View All Employees":
-      employee.viewEmp();
+      employee.viewEmp(init);
       break;
     case "View All Roles":
-      employee.viewRole();
+      employee.viewRole(init);
       break;
     default:
       return;
   }
 }
 
+//BUG: Repeats initial question once the first time arrow key pressed - I think this is just an Inquirer bug
 // Initialize function
-function init() {
+const init = function () {
   inquirer.prompt(question).then((answers) => {
     if (answers.action === "Quit") {
       return;
@@ -82,7 +72,7 @@ function init() {
       handleAnswers(answers);
     }
   });
-}
+};
 
 // Call to initialize
 init();
